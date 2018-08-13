@@ -26,8 +26,6 @@ const withQuery = <TData extends Object>(query: () => Promise<TData[]>) => (Wrap
             loading: true
         });
 
-        // (data: TData[]) => )
-
         query()
             .then((data: TData[]) => this.setState({
                 contacts: data,
