@@ -1,4 +1,5 @@
+import * as ContactsService from "../../api/ContactsService";
 import Components from "./Contacts";
-import withContacts from "./WithContacts";
+import withQuery from "./WithContacts";
 
-export default withContacts(Components);
+export default withQuery(ContactsService.getContacts)(Components);

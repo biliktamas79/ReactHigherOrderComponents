@@ -1,47 +1,49 @@
 import * as React from "react";
-import * as ContactsService from "../../api/ContactsService";
-import IContact from "../../api/IContact";
 
-interface IWithContacts {
-    contacts: IContact[],
-    loading?: boolean
+interface IWithContacts<TData> {
+    contacts: TData[],
+    loading: boolean
 }
 
-interface IWrappedComponentProps {
-    contacts: IContact[]
+interface IWrappedComponentProps<TData> {
+    contacts: TData[]
 }
 
-const withContacts = (WrappedComponent: React.ComponentType<IWrappedComponentProps>) => class WithContacts extends React.PureComponent<{}, IWithContacts> {
+// tslint:disable-next-line:ban-types
+const withQuery = <TData extends Object>(query: () => Promise<TData[]>) => (WrappedComponent: React.ComponentType<IWrappedComponentProps<TData>>) => class WithContacts extends React.PureComponent<{}, IWithContacts<TData>> {
     constructor(props: {}) {
         super(props);
-        
+
         this.state = {
-          contacts: [],
+            contacts: [],
+            loading: false
         };
-      }
-    
-      public componentDidMount() {
+    }
+
+    public componentDidMount() {
         this.setState({
+            contacts: [],
             loading: true
         });
 
-        ContactsService
-          .getContacts()
-          .then(contacts => this.setState({
-            contacts,
-            loading: false
-          }))
-      }
-    
+        // (data: TData[]) => )
+
+        query()
+            .then((data: TData[]) => this.setState({
+                contacts: data,
+                loading: false
+            }))
+    }
+
     public render() {
         return <div>
             {
-                this.state.loading ? 
+                this.state.loading ?
                     <div>Loading...</div> :
-                    <WrappedComponent contacts={this.state.contacts} { ...this.props} />
+                    <WrappedComponent contacts={this.state.contacts} {...this.props} />
             }
-        </div>  
+        </div>
     }
 }
 
-export default withContacts;
+export default withQuery;
